@@ -100,8 +100,8 @@ def get_birthday(birthday, year, today):
 
 def get_ciba():
    try:
-        key = config["tian_api"]
-        url = "http://api.tianapi.com/zaoan/index?key=b0c30dea05a988decada9ac7df0fe093"
+        key = 'b0c30dea05a988decada9ac7df0fe093'
+        url = "http://api.tianapi.com/zaoan/index?key={}".format(key)
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                           'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',

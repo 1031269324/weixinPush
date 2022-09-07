@@ -99,28 +99,19 @@ def get_birthday(birthday, year, today):
 
 
 def get_ciba():
-   try:
-        key = 'b0c30dea05a988decada9ac7df0fe093'
-        url = "http://api.tianapi.com/zaoan/index?key={}".format(key)
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-            'Content-type': 'application/x-www-form-urlencoded'
-
-        }
-        response = get(url, headers=headers).json()
-        if response["code"] == 200:
-            chp = response["newslist"][0]["content"]
-        else:
-            chp = ""
-    except KeyError:
-        chp = ""
-    return chp
+    url = "http://open.iciba.com/dsapi/"
+    headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+    }
+    r = get(url, headers=headers)
+    note_en = r.json()["content"]
+    note_ch = r.json()["note"]
+    return note_ch, note_en
 
 
-
-
-def send_message(to_user, access_token, city_name, weather, max_temperature, min_temperature, note_ch):
+def send_message(to_user, access_token, city_name, weather, max_temperature, min_temperature, note_ch, note_en):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -170,11 +161,14 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
                 "value": love_days,
                 "color": get_color()
             },
-            "chp": {
-                "value": chp,
-                "color":  color("color_chp", config)
+            "note_en": {
+                "value": note_en,
+                "color": get_color()
             },
-
+            "note_ch": {
+                "value": note_ch,
+                "color": get_color()
+            }
         }
     }
     for key, value in birthdays.items():
@@ -225,8 +219,8 @@ if __name__ == "__main__":
     province, city = config["province"], config["city"]
     weather, max_temperature, min_temperature = get_weather(province, city)
     # 获取词霸每日金句
-    note_ch = get_ciba()
+    note_ch, note_en = get_ciba()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, city, weather, max_temperature, min_temperature, note_ch)
+        send_message(user, accessToken, city, weather, max_temperature, min_temperature, note_ch, note_en)
     os.system("pause")
